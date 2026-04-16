@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, inital-scale=1.0" />
+<title></title>
+<style type="text/css">
+
+</style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة فصل 1/1 - مدرسة الأخصاص</title>
+  <style>
+    :root {
+      --primary: #1e3c72;
+      --secondary: #2a5298;
+      --accent-gradient: linear-gradient(45deg, #fdbb2d, #b21f1f);
+      --boy-card: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      --girl-card: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+      --gold: #d4af37;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0; padding: 15px; 
+      transition: background 2s ease-in-out, filter 0.3s ease;
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    }
+
+    .container {
+      max-width: 1100px; width: 95%; background: rgba(255, 255, 255, 0.95);
+      padding: 30px; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+      border-top: 10px solid var(--primary); backdrop-filter: blur(10px);
+    }
+
+    .datetime-container {
+      text-align: center; color: #fff;
+      background: var(--accent-gradient); padding: 15px 25px; border-radius: 50px;
+      width: fit-content; margin: 0 auto 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .welcome-msg {
+      text-align: center; font-size: 1.5em; font-weight: bold; color: var(--primary);
+      margin-bottom: 15px; border-bottom: 2px dashed var(--gold); padding-bottom: 10px;
+    }
+
+    .buttons { 
+      display: none; justify-content: center; gap: 15px; margin-bottom: 25px; 
+      flex-wrap: wrap; padding: 20px; border-radius: 20px;
+      animation: fadeIn 0.5s ease, changeNavBg 12s infinite alternate;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    @keyframes changeNavBg {
+      0% { background-color: rgba(255, 255, 255, 0.9); }
+      50% { background-color: #e3f2fd; } 
+      100% { background-color: #fff3e0; } 
+    }
+
+    .nav-btn {
+      padding: 12px 20px; border: none; border-radius: 12px; 
+      background-color: var(--primary); color: white; cursor: pointer; transition: 0.3s;
+      font-weight: bold; font-family: inherit;
+    }
+    .nav-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+    .section { display: none; animation: fadeIn 0.5s ease; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .search-box { width: 100%; text-align: center; margin-bottom: 20px; }
+    #studentSearch {
+      width: 80%; max-width: 400px; padding: 12px 20px; border-radius: 30px;
+      border: 2px solid var(--primary); font-size: 1rem; outline: none;
+    }
+
+    #specialResult {
+      display: none; background: linear-gradient(45deg, #fff9e6, #fff3cd);
+      border: 2px solid #d4af37; border-radius: 15px; padding: 20px;
+      margin: 10px auto 20px; text-align: center; font-size: 1.5em;
+      font-weight: bold; color: #856404; box-shadow: 0 10px 20px rgba(212,175,55,0.2);
+      animation: slideDown 0.5s ease; position: relative;
+    }
+    @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .star { position: fixed; top: -20px; color: #d4af37; font-size: 20px; pointer-events: none; z-index: 9999; animation: fall linear forwards; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 10px; overflow: hidden; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+    th { background: var(--primary); color: white; }
+    .weekend { background-color: #ffebee; color: #c62828; font-weight: bold; }
+
+    .student-li { cursor: pointer; padding: 5px; border-radius: 5px; transition: 0.2s; list-style-position: inside; }
+    .student-li.absent { background: #ffcdd2; color: #b71c1c; text-decoration: line-through; }
+    .attendance-stats { text-align: center; font-weight: bold; margin-bottom: 10px; color: var(--primary); }
+
+    .rosary-ui { text-align: center; background: #fff; padding: 20px; border-radius: 30px; }
+    .dhikr-display-box {
+      background: #f9f9f9; border-top: 2px solid #e0c068; border-bottom: 2px solid #e0c068;
+      padding: 30px 10px; margin: 20px 0; font-size: 2em; font-weight: bold; color: #1e3c72;
+    }
+    .counter-container {
+      background: #0f2027; padding: 10px 40px; border-radius: 20px;
+      border: 3px solid #d4af37; box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+      display: inline-block; margin-bottom: 20px;
+    }
+    .counter {
+      font-size: 80px; font-weight: 900; font-family: 'Courier New', monospace;
+      background: linear-gradient(to bottom, #d4af37, #f2d06b, #8a6d3b);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+    }
+    .counter.pulse { transform: scale(1.1); }
+
+    .temp-circle { font-size: 3rem; font-weight: bold; color: #ffeb3b; text-shadow: 1px 1px 5px rgba(0,0,0,0.2); }
+    .wind-speed { font-size: 1.2rem; color: var(--primary); margin-top: 10px; font-weight: bold; }
+    .credits-footer { margin-top: 40px; padding: 20px; text-align: center; background: rgba(248, 249, 250, 0.9); border-radius: 20px; border: 1px solid #eee; }
+    
+    .countdown-box { background: #333; color: #fff; padding: 15px; border-radius: 15px; margin-top: 10px; display: inline-block; }
+    
+    .nav-group {
+      display: flex; gap: 8px; padding: 10px; border-radius: 15px; border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .prayer-timer-card {
+        background: var(--primary);
+        color: white;
+        padding: 20px;
+        border-radius: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        border: 2px solid var(--gold);
+    }
+  </style>
+</head>
+<body id="mainBody">
+
+<div class="container">
+  <h1>🏫 مدرسة الأخصاص الثانوية - فصل 1/1</h1>
+  
+  <div class="datetime-container">
+    <span id="topDate">...</span> | <span id="topClock">00:00:00</span>
+  </div>
+
+  <div id="main-entry">
+    <div class="welcome-msg" id="greeting">...جاري التحية</div>
+    <div style="background: rgba(255, 255, 255, 0.7); border-right: 6px solid var(--gold); padding: 25px; margin: 0 auto 30px; border-radius: 15px; text-align: center;">
+      <strong>💡 حكمة اليوم:</strong><br>
+      <span id="activeWisdom" style="min-height: 1.5em; display: inline-block;"></span>
+      <br><br>
+      <button class="nav-btn" style="font-size: 14px; padding: 5px 15px;" onclick="speakWisdom()">🔊 استمع للحكمة</button>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+        <div class="countdown-box">
+            <span>⏳ متبقي على امتحانات نهاية العام (16/5):</span><br>
+            <strong id="examCountdown" style="font-size: 1.2em; color: #fdbb2d;">جاري الحساب...</strong>
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+      <button class="nav-btn" style="font-size: 20px; padding: 20px 50px; border-radius: 50px;" onclick="unlockSystem()">🔓 دخول نظام الفصل</button>
+    </div>
+  </div>
+
+  <div class="buttons" id="nav-buttons">
+    <div class="nav-group" style="background: rgba(30, 60, 114, 0.05);">
+        <button class="nav-btn" onclick="showSection('students')">👥 الطلاب</button>
+        <button class="nav-btn" onclick="showSection('schedule')">📅 الجدول</button>
+    </div>
+
+    <div class="nav-group" style="background: rgba(46, 125, 50, 0.05);">
+        <button class="nav-btn" style="background: #2e7d32;" onclick="showSection('quiz')">🧠 الألعاب</button>
+        <button class="nav-btn" style="background: #2e7d32;" onclick="showSection('weather'); getWeather()">🌦️ الطقس</button>
+    </div>
+
+    <div class="nav-group" style="background: rgba(212, 175, 55, 0.05);">
+        <button class="nav-btn" style="background: #8a6d3b;" onclick="showSection('rosary')">📿 السبحة</button>
+        <button class="nav-btn" style="background: #8a6d3b;" onclick="showSection('prayer')">⏰ الصلاة</button>
+    </div>
+
+    <button class="nav-btn" style="background:#444; margin-right: auto;" onclick="toggleDarkMode()">🌙/☀️</button>
+  </div>
+
+  <div class="section" id="students">
+    <div class="attendance-stats" id="attStats">إجمالي الحضور: --</div>
+    <div class="search-box">
+      <input type="text" id="studentSearch" placeholder="🔍 ابحث (اضغط على الاسم للغياب)..." onkeyup="filterStudents()">
+    </div>
+    <div id="specialResult"></div>
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+        <div style="flex:1; min-width:250px; background:var(--boy-card); padding:15px; border-radius:15px;">
+          <h3>👦 البنين</h3>
+          <ol id="boysList"></ol>
+        </div>
+        <div style="flex:1; min-width:250px; background:var(--girl-card); padding:15px; border-radius:15px;">
+          <h3>👧 البنات</h3>
+          <ol id="girlsList"></ol>
+        </div>
+    </div>
+  </div>
+
+  <div class="section" id="schedule">
+    <table>
+      <thead><tr><th>اليوم</th><th>1-2</th><th>3-4</th><th>5-6</th><th>7-8</th></tr></thead>
+      <tbody>
+        <tr><td>الأحد</td><td>علوم</td><td>فلسفة</td><td>فرنسي</td><td>رياضة</td></tr>
+        <tr><td>الاثنين</td><td>تاريخ</td><td>نشاط</td><td>عربي</td><td>انجليزي</td></tr>
+        <tr><td>الثلاثاء</td><td>انجليزي</td><td>برمجة</td><td>عربي</td><td>دين</td></tr>
+        <tr><td>الأربعاء</td><td>عربي</td><td>تاريخ</td><td>علوم</td><td>برمجة</td></tr>
+        <tr><td>الخميس</td><td>علوم</td><td>رياضة</td><td>ألعاب</td><td>فلسفة</td></tr>
+        <tr class="weekend"><td>الجمعة</td><td colspan="4">عطلة رسمية 🏠</td></tr>
+        <tr class="weekend"><td>السبت</td><td colspan="4">عطلة رسمية 🏠</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section" id="rosary">
+    <div class="rosary-ui">
+      <select id="dhikrSelector" onchange="updateDhikrDisplay()" style="padding:15px; border-radius:10px; width:100%; font-weight:bold; border: 1px solid #ccc;">
+        <option>سبحان الله</option><option>الحمد لله</option><option>الله أكبر</option><option>لا إله إلا الله</option><option>أستغفر الله</option><option>اللهم صلِّ على محمد</option>
+      </select>
+      <div class="dhikr-display-box" id="dhikrBox">سبحان الله</div>
+      <div class="counter-container"><div class="counter" id="rosaryCounter">0</div></div>
+      <button class="nav-btn" style="background:var(--accent-gradient); padding: 20px; width: 100%; font-size: 1.5em; border-radius: 50px;" onclick="countUp()">تسبيح</button>
+      <br><br>
+      <button class="nav-btn" style="background:#dc3545; font-size: 0.8em;" onclick="countReset()">تصفير</button>
+    </div>
+  </div>
+
+  <div class="section" id="quiz">
+    <div class="special-card" style="background: #e8f5e9; padding: 25px; border-radius: 20px; border: 2px solid #2e7d32; text-align: center; margin-bottom: 20px;">
+        <h2 style="color: #1b5e20;">🎮 لعبة تخمين الرقم</h2>
+        <p>أنا أفكر في رقم بين 1 و 50، هل يمكنك معرفته؟</p>
+        <input type="number" id="guessInput" placeholder="أدخل رقمك..." style="padding: 10px; border-radius: 8px; width: 60%;">
+        <button class="nav-btn" style="background: #2e7d32;" onclick="playGuessGame()">تخمين</button>
+        <p id="game-msg" style="font-weight: bold; margin-top: 10px;"></p>
+    </div>
+    <div class="special-card" style="background: #f3e5f5; padding: 25px; border-radius: 20px; border: 2px solid #9c27b0; text-align: center;">
+        <h2 style="color: #7b1fa2;">🧠 سؤال اليوم</h2>
+        <div id="daily-question" style="font-size: 1.4em; margin: 15px 0;">جاري تحميل السؤال...</div>
+        <input type="text" id="answerInput" placeholder="الإجابة..." style="padding: 10px; border-radius: 8px; width: 60%;">
+        <button class="nav-btn" style="background: #9c27b0;" onclick="checkAns()">تحقق</button>
+        <p id="quiz-msg" style="font-weight: bold; margin-top: 10px;"></p>
+    </div>
+  </div>
+
+  <div class="section" id="prayer">
+    <div style="text-align:center;">
+        <select id="citySelector" style="padding:10px; border-radius:10px; margin-bottom: 20px;" onchange="updatePrayerTimes()">
+            <option value="Giza">الجيزة</option><option value="Cairo">القاهرة</option><option value="Alexandria">الإسكندرية</option>
+        </select>
+
+        <div class="prayer-timer-card">
+            <span id="nextPrayerName" style="font-weight: bold;">جاري البحث عن الصلاة القادمة...</span><br>
+            <strong id="prayerCountdown" style="font-size: 2em; letter-spacing: 2px;">00:00:00</strong>
+        </div>
+
+        <div id="prayerLines" style="background: #fffcf0; padding: 15px; border-radius: 15px; border: 2px solid var(--gold);"></div>
+    </div>
+  </div>
+
+  <div class="section" id="weather">
+    <div style="text-align: center; background: #f0f4f8; padding: 20px; border-radius: 20px; border: 2px solid var(--primary);">
+      <h3>⛅ حالة الطقس في الأخصاص</h3>
+      <div id="weather-content">
+        <div class="temp-circle">25°C</div>
+        <div class="wind-speed">الرياح: 12 كم/س</div>
+      </div>
+      <button class="nav-btn" onclick="getWeather()">تحديث الطقس 🔄</button>
+    </div>
+  </div>
+
+  <div class="credits-footer">
+    <div>💎 تصميم: أحمد شريف & أحمد عيد</div>
+    <div style="color: #b21f1f; font-weight: bold;">👨‍🏫 تحت إشراف الأستاذ: أيمن</div>
+  </div>
+</div>
+
+<script>
+  const boys = ["ابراهيم اشرف","ابراهيم علاء","ابراهيم عمرو","احمد ابراهيم","احمد باسم","احمد حسن","احمد حسين","احمد سامح","احمد سمير","احمد شريف","احمد طارق","احمد عبد الوهاب","احمد عماد الدين","احمد عيد","احمد مجدي"];
+  const girls = ["اسراء صبري","اسماء سلامه","اسماء عرفه","اسماء فارس","اصاله حمدي","الاء اشرف","الزهراء وهبه","الهام عبد الباسط","امل عمار","امنيه عبد العزيز","انجي جورج","ايريني جورج","ايه ابراهيم","ايه احمد","ايه رسمي","ايه سامي","ايه صبري","ايه محمد","امل عطيه","آيه احمد سعيد","بسمله اسامه","بسمله جبر","بسمله سامح","بسمله سامي","بسمله طارق","بسمه رضا","بسمه رضا محمد","بسنت حسانين","بسنت سعيد"];
+
+  const wisdoms = ["النجاح ليس بمقدار ما تنجزه، بل بمقدار التحديات التي تتغلب عليها.", "أنت في سن الحلم، فاجعل أحلامك كبيرة بقدر طموحك.", "العلم ليس ما تحفظه، بل ما ينفعك في حياتك.", "الثقة بالنفس هي أول خطوات النجاح.", "لا تقارن بدايتك بنهاية الآخرين، فلكل شخص مساره الخاص.", "الفشل هو مجرد درس في طريق التميز.", "كن أنت النسخة الأفضل من نفسك، لا تقليداً لشخص آخر.", "أعظم استثمار هو الاستثمار في عقلك.", "الصداقة الحقيقية كنز، فحافظ على من يدفعك للأمام.", "وقتك هو أغلى ما تملك، فلا تضيعه فيما لا يفيد.", "الخجل من الخطأ خطأ أكبر، تعلم منه وامضِ قدماً.", "المستقبل يبدأ من القرارات التي تتخذها اليوم.", "كن لطيفاً، فاللطف قوة وليس ضعفاً.", "القراءة تمنحك آلاف الحيوات في حياة واحدة.", "لا تستسلم عندما تتعب، استسلم عندما تنتهي.", "الإرادة القوية تصنع المستحيل.", "التواضع يرفع قدرك في عيون الناس.", "الاحترام يُكتسب ولا يُطلب.", "اجعل من عثراتك أحجاراً تبني بها سلماً للقمة.", "العمل الجماعي يختصر المسافات.", "الأمانة هي صفة العظماء.", "بر الوالدين هو مفتاح كل توفيق.", "لا تخف من طرح الأسئلة، فالسؤال مفتاح المعرفة.", "الصبر مر مذاقه، لكن نتائجه حلوة.", "الانضباط هو الجسر بين الأهداف والإنجازات.", "الحياة مدرسة، فكن تلميذاً نبيهاً.", "ابتسامتك في وجه أخيك صدقة.", "ركز على الحلول لا على المشكلات.", "التغيير يبدأ من الداخل.", "كن شجاعاً في الدفاع عن مبادئك.", "الكلمة الطيبة تفتح الأبواب المغلقة.", "التنظيم يوفر نصف الوقت.", "لا تؤجل عمل اليوم إلى الغد.", "الصحة تاج، فحافظ عليها بالرياضة والغذاء.", "من جد وجد، ومن زرع حصد.", "كن صاحب أثر جميل أينما حللت.", "الاعتذار عند الخطأ من شيم الكبار.", "العقل السليم في الجسم السليم.", "اجعل هدفك إرضاء الله أولاً.", "النجاح رحلة وليس وجهة.", "تعلم لغة جديدة تفتح لك آفاقاً جديدة.", "الهوايات تنمي الإبداع.", "لا تدع وسائل التواصل تسرق حياتك الواقعية.", "كن ممتناً لما تملك.", "الصدق منجاة.", "القناعة كنز لا يفنى.", "تحدى نفسك لتكون أفضل من الأمس.", "استمع أكثر مما تتكلم.", "التفاؤل يمنحك طاقة للإنجاز.", "كل عظيم كان طفلاً يحلم.", "المعرفة قوة.", "الحلم لا يتحقق بالمعجزات، بل بالجهد.", "كن ملهماً لمن حولك.", "الحياة قصيرة، فاجعلها ذات معنى.", "تعلم مهارات التفكير النقدي.", "الذكاء هو القدرة على التكيف.", "كن صادقاً مع نفسك.", "الوفاء بالوعد دليل المروءة.", "التفكير الإيجابي يغير حياتك.", "لا تحكم على الكتاب من غلافه.", "التميز يحتاج إلى استمرارية.", "كن صبوراً مع نفسك ومع الآخرين.", "الأفعال أبلغ من الأقوال.", "تعلم من تجارب من هم أكبر منك.", "الرحمة بالضعفاء قوة.", "استخدم التكنولوجيا لبناء مستقبلك.", "كن فخوراً بهويتك وثقافتك.", "العزيمة تذلل الصعاب.", "ابحث عن شغفك وتمسك به.", "التميز ليس فعلاً بل عادة.", "كن مبادراً ولا تنتظر الفرص.", "الإبداع هو رؤية المألوف بطريقة غير مألوفة.", "حافظ على صلواتك، فهي نور حياتك.", "الهدوء يمنحك وضوح الرؤية.", "لا تلتفت للمحبطين.", "كن أنت التغيير الذي تريده.", "التعاون سر النجاح.", "احلم بلا حدود.", "الاجتهاد يغلب الموهبة أحياناً.", "كن حكيماً في اختيار أصدقائك.", "الحياة تجارب، فتعلم منها.", "التخطيط الجيد نصف العمل.", "كن قوياً في مواجهة التنمر.", "ساعد غيرك يزدد خيرك.", "حب الخير للآخرين يريح قلبك.", "الصدق يبني الجسور.", "التواضع يزيدك جمالاً.", "المثابرة تحقق المعجزات.", "كن متعاوناً في منزلك.", "الرياضة تفرغ الطاقة السلبية.", "كن واعياً لما تقوله.", "المستقبل للمتعلمين.", "الحق دائماً ينتصر.", "كن كريماً في مشاعرك.", "التعلم الذاتي هو سر التميز.", "كن متفائلاً بغد أفضل.", "أنت مبدع بطريقتك الخاصة.", "الحياة أمل، فتمسك به.", "كن قدوة حسنة لزملائك.", "بالعلم ترتقي الأمم."];
+
+  const dailyQuestions = [
+    {q: "ما هو الشيء الذي له عين واحدة ولكنه لا يرى؟", a: "ابرة"},
+    {q: "ما هو الكوكب الأحمر؟", a: "المريخ"},
+    {q: "أطول نهر في العالم؟", a: "النيل"},
+    {q: "شيء تملكه ويستخدمه الآخرون أكثر منك؟", a: "اسمك"}
+  ];
+  
+  for(let i=5; i<=1000; i++) {
+    dailyQuestions.push({ q: `سؤال الذكاء رقم ${i}: ما هو حاصل ضرب ${i} في 1؟`, a: `${i}` });
+  }
+
+  function typeWisdom(text) {
+    let i = 0; const el = document.getElementById("activeWisdom");
+    el.innerHTML = "";
+    function type() { if (i < text.length) { el.innerHTML += text.charAt(i); i++; setTimeout(type, 50); } }
+    type();
+  }
+
+  function setDailyContent() {
+    const now = new Date(); const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start; const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const wIndex = dayOfYear % wisdoms.length; typeWisdom(wisdoms[wIndex]);
+    const qIndex = dayOfYear % dailyQuestions.length;
+    document.getElementById("daily-question").innerText = dailyQuestions[qIndex].q;
+    window.currentAnswer = dailyQuestions[qIndex].a;
+  }
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playBeep() {
+    const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain();
+    oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+    oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); 
+    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.1);
+  }
+
+  function speakWisdom() {
+    const text = document.getElementById("activeWisdom").innerText; window.speechSynthesis.cancel();
+    const msg = new SpeechSynthesisUtterance(); msg.text = text; msg.lang = 'ar-SA';
+    window.speechSynthesis.speak(msg);
+  }
+
+  function renderStudents() {
+    const bList = document.getElementById('boysList'); const gList = document.getElementById('girlsList');
+    bList.innerHTML = ""; gList.innerHTML = "";
+    boys.forEach(name => { bList.innerHTML += `<li class="student-li" onclick="toggleAttendance(this)"><span>${name}</span></li>`; });
+    girls.forEach(name => { gList.innerHTML += `<li class="student-li" onclick="toggleAttendance(this)"><span>${name}</span></li>`; });
+    updateAttendanceStats();
+  }
+
+  function toggleAttendance(el) { el.classList.toggle('absent'); updateAttendanceStats(); }
+  function updateAttendanceStats() {
+    const total = boys.length + girls.length; const absent = document.querySelectorAll('.student-li.absent').length;
+    document.getElementById('attStats').innerText = `إجمالي الحضور: ${total - absent} من ${total}`;
+  }
+
+  let secretNum = Math.floor(Math.random() * 50) + 1;
+  function playGuessGame() {
+    const guess = document.getElementById('guessInput').value; const msg = document.getElementById('game-msg');
+    if (guess == secretNum) { msg.innerText = "🎉 مبروك! هو " + secretNum; msg.style.color = "green"; secretNum = Math.floor(Math.random() * 50) + 1; }
+    else if (guess < secretNum) { msg.innerText = "📈 أكبر"; msg.style.color = "blue"; }
+    else { msg.innerText = "📉 أصغر"; msg.style.color = "orange"; }
+  }
+
+  function updateGreeting() {
+    const hours = new Date().getHours(); const greetElement = document.getElementById("greeting");
+    if (hours >= 5 && hours < 12) greetElement.innerText = "☀️ صباح الخير يا أبطال 1/1";
+    else if (hours >= 12 && hours < 18) greetElement.innerText = "✨ طاب يومكم يا مبدعي الأخصاص";
+    else greetElement.innerText = "🌙 مساء الخير يا نجوم المستقبل";
+  }
+
+  function unlockSystem() { 
+    document.getElementById('main-entry').style.display = 'none'; 
+    document.getElementById('nav-buttons').style.display = 'flex'; 
+    showSection('students'); updatePrayerTimes(); 
+  }
+
+  function showSection(id) { 
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active')); 
+    document.getElementById(id).classList.add('active'); 
+  }
+
+  let prayerTimesObj = null;
+
+  function updateTime() {
+    const now = new Date();
+    document.getElementById("topClock").innerText = now.toLocaleTimeString('ar-EG');
+    document.getElementById("topDate").innerText = now.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+    updateGreeting(); updateExamCountdown();
+    if(prayerTimesObj) calculateNextPrayer();
+  }
+  setInterval(updateTime, 1000);
+
+  function calculateNextPrayer() {
+    const now = new Date();
+    const namesAr = {"Fajr":"الفجر", "Dhuhr":"الظهر", "Asr":"العصر", "Maghrib":"المغرب", "Isha":"العشاء"};
+    let next = null;
+
+    for (let p in namesAr) {
+        let pTime = new Date();
+        let [h, m] = prayerTimesObj[p].split(':');
+        pTime.setHours(h, m, 0);
+        if (pTime > now) { next = {name: namesAr[p], time: pTime}; break; }
+    }
+
+    if (!next) {
+        let pTime = new Date();
+        let [h, m] = prayerTimesObj["Fajr"].split(':');
+        pTime.setDate(pTime.getDate() + 1);
+        pTime.setHours(h, m, 0);
+        next = {name: "الفجر (غداً)", time: pTime};
+    }
+
+    const diff = next.time - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    
+    document.getElementById("nextPrayerName").innerText = `متبقي على أذان ${next.name}:`;
+    document.getElementById("prayerCountdown").innerText = 
+        `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+  function updateExamCountdown() {
+    const examDate = new Date(`May 16, ${new Date().getFullYear()} 09:00:00`).getTime();
+    const diff = examDate - new Date().getTime();
+    if (diff > 0) {
+      const d = Math.floor(diff / 86400000); const h = Math.floor((diff % 86400000) / 3600000);
+      document.getElementById("examCountdown").innerText = `${d} يوم و ${h} ساعة`;
+    } else document.getElementById("examCountdown").innerText = "بالتوفيق! 🎓";
+  }
+
+  function createStars() {
+    for (let i = 0; i < 30; i++) {
+      const star = document.createElement('div'); star.className = 'star'; star.innerText = '⭐';
+      star.style.left = Math.random() * 100 + 'vw'; star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+      document.body.appendChild(star); setTimeout(() => star.remove(), 2500);
+    }
+  }
+
+  function filterStudents() {
+    let filter = document.getElementById('studentSearch').value.trim();
+    let specialBox = document.getElementById('specialResult');
+    if (filter === "احمد عيد" || filter === "احمد شريف") {
+      specialBox.style.display = "block"; specialBox.innerHTML = `👑 القائد المتميز ${filter} ⭐`;
+      createStars(); document.querySelectorAll('.student-li').forEach(li => li.style.display = "none");
+    } else {
+      specialBox.style.display = "none";
+      document.querySelectorAll('.student-li').forEach(li => { li.style.display = li.innerText.includes(filter) ? "" : "none"; });
+    }
+  }
+
+  let count = parseInt(localStorage.getItem('rosaryCount')) || 0;
+  function updateDhikrDisplay() { document.getElementById('dhikrBox').innerText = document.getElementById('dhikrSelector').value; }
+  function countUp() { 
+    count++; playBeep(); const el = document.getElementById("rosaryCounter"); 
+    el.innerText = count; el.classList.add("pulse"); setTimeout(()=>el.classList.remove("pulse"),100); 
+    localStorage.setItem('rosaryCount', count); 
+  }
+  function countReset() { if(confirm("تصفير؟")) { count = 0; document.getElementById("rosaryCounter").innerText = "0"; localStorage.setItem('rosaryCount', 0); } }
+
+  function checkAns() {
+    const val = document.getElementById('answerInput').value; const msg = document.getElementById('quiz-msg');
+    const correctAns = window.currentAnswer;
+    if(val.includes(correctAns)) { msg.innerText = "✅ صحيح!"; msg.style.color = "green"; }
+    else { msg.innerText = "❌ فكر تاني"; msg.style.color = "red"; }
+  }
+
+  function toggleDarkMode() { const b = document.body; b.style.filter = b.style.filter.includes("invert") ? "none" : "invert(1) hue-rotate(180deg)"; }
+
+  async function getWeather() {
+    try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=29.8&longitude=31.2&current_weather=true`);
+        const data = await res.json();
+        document.getElementById('weather-content').innerHTML = `<div class="temp-circle">${Math.round(data.current_weather.temperature)}°C</div><div class="wind-speed">الرياح: ${data.current_weather.windspeed} كم/س</div>`;
+    } catch { document.getElementById('weather-content').innerHTML = `<div class="temp-circle">25°C</div><div>(أوفلاين)</div>`; }
+  }
+
+  async function updatePrayerTimes() {
+    const city = document.getElementById("citySelector").value;
+    try {
+        const res = await fetch(`https://api.aladhan.com/v1/timingsByAddress?address=${city},Egypt&method=5`);
+        const data = await res.json(); 
+        prayerTimesObj = data.data.timings;
+        const names = {"Fajr":"الفجر", "Dhuhr":"الظهر", "Asr":"العصر", "Maghrib":"المغرب", "Isha":"العشاء"};
+        let html = ""; for(let k in names) html += `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee;"><span>${names[k]}</span><b>${prayerTimesObj[k]}</b></div>`;
+        document.getElementById('prayerLines').innerHTML = html;
+        calculateNextPrayer();
+    } catch { document.getElementById('prayerLines').innerHTML = "لا يوجد اتصال"; }
+  }
+
+  window.onload = () => { updateTime(); setDailyContent(); renderStudents(); document.getElementById("rosaryCounter").innerText = count; getWeather(); };
+</script>
+</body>
+</html>
+<script type="text/javascript">
+(function() {
+
+})();
+</script>
+</body>
+</html>
