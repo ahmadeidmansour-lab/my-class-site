@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, inital-scale=1.0" />
+<title></title>
+<style type="text/css">
+
+</style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مصحف النور - أحمد عيد</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;700&display=swap');
+
+        :root {
+            --gold: #c5a059;
+            --primary: #1e3d1a;
+            --bg-body: #fdfcf7;
+            --text-color: #333;
+            --card-bg: white;
+        }
+
+        body.dark-mode {
+            --primary: #0a0a0a;
+            --bg-body: #121212;
+            --text-color: #e0e0e0;
+            --card-bg: #1e1e1e;
+        }
+
+        body { 
+            font-family: 'Cairo', sans-serif; margin: 0; background-color: var(--bg-body); 
+            color: var(--text-color); transition: 0.3s; overflow-x: hidden;
+        }
+
+        #welcome-screen {
+            height: 100vh; width: 100%; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            background-color: #1e3d1a; color: white; text-align: center; position: fixed; z-index: 4000;
+            transition: background-color 2s ease-in-out, transform 0.8s ease;
+        }
+
+        /* تنسيق الساعة والتاريخ */
+        .digital-clock { font-size: 2.5rem; font-weight: bold; color: var(--gold); margin: 15px 0 5px 0; font-family: sans-serif; }
+        .digital-date { font-size: 1.2rem; opacity: 0.9; margin-bottom: 30px; }
+
+        .sidenav {
+            height: 100%; width: 0; position: fixed; z-index: 3000;
+            top: 0; right: 0; background-color: var(--card-bg); overflow-x: hidden;
+            transition: 0.5s; box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+        }
+        .sidenav-header { background: #1e3d1a; color: white; padding: 30px 20px; text-align: center; }
+        .sidenav a { padding: 15px 25px; text-decoration: none; font-size: 1.3rem; color: var(--text-color); display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #444; }
+
+        .navbar { display: flex; align-items: center; justify-content: space-between; padding: 15px 25px; background: var(--primary); color: white; position: sticky; top: 0; z-index: 1000; }
+        
+        #scrollToTop {
+            position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px; 
+            background-color: #007bff; color: white; border: none; border-radius: 50%;
+            font-size: 24px; cursor: pointer; display: none; z-index: 2000; justify-content: center; align-items: center;
+        }
+
+        .surah-card { background: var(--card-bg); color: var(--text-color); padding: 25px; border-radius: 15px; text-align: center; border: 1px solid #444; cursor: pointer; transition: 0.3s; font-weight: bold; }
+        .reading-area { padding: 40px; font-size: 2.3rem; text-align: center; font-family: 'Amiri', serif; line-height: 2.8; }
+
+        #tafsir-modal {
+            display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 500px; background: var(--card-bg); border: 2px solid var(--gold);
+            padding: 20px; border-radius: 15px; z-index: 5000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .rosary-card { background: var(--card-bg); padding: 40px; border-radius: 30px; display: inline-block; width: 90%; max-width: 400px; }
+    </style>
+</head>
+<body id="mainBody">
+
+<button id="scrollToTop" onclick="goToTop()">↑</button>
+
+<div id="tafsir-modal">
+    <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--gold); margin-bottom:10px; padding-bottom:5px;">
+        <b style="color:var(--gold)">التفسير الميسر</b>
+        <span onclick="document.getElementById('tafsir-modal').style.display='none'" style="cursor:pointer; color:red;">✖</span>
+    </div>
+    <div id="tafsir-content">اضغط على آية لعرض تفسيرها</div>
+</div>
+
+<div id="welcome-screen">
+    <div style="font-family: 'Amiri'; font-size: 5rem; color: var(--gold);">مصحف النور</div>
+    <div style="border: 2px solid var(--gold); padding: 10px 40px; border-radius: 50px; font-size: 1.5rem;">إبداع الفتى الذهبي: أحمد عيد منصور</div>
+    
+    <div id="clock" class="digital-clock">00:00:00</div>
+    <div id="date" class="digital-date">الأحد، 1 يناير 2026</div>
+
+    <button onclick="enterApp()" style="background: var(--gold); color: #1e3d1a; padding: 15px 60px; font-size: 1.4rem; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">الدخول لمحراب القرآن</button>
+</div>
+
+<div id="mySidenav" class="sidenav">
+    <div class="sidenav-header">
+        <div style="font-size: 1.5rem;">القائمة الرئيسية</div>
+        <div style="font-size: 1rem; color: var(--gold);">إعداد أحمد عيد منصور</div>
+    </div>
+    <a href="javascript:void(0)" style="color:red; text-align:center; display:block;" onclick="closeNav()">✖ إغلاق</a>
+    <a href="#" onclick="showView('home-view')">🏠 الصفحة الرئيسية</a>
+    <a href="#" onclick="showView('rosary-view')">📿 سبحة الأذكار</a>
+    <a href="#" onclick="showView('home-view')">📜 فهرس السور الكامل</a>
+</div>
+
+<div id="main-content" style="display:none;">
+    <div class="navbar">
+        <span style="font-size:30px; cursor:pointer;" onclick="openNav()">☰</span>
+        <div style="font-family: 'Amiri'; font-size: 1.8rem;">مصحف النور</div>
+        <span id="modeBtn" onclick="toggleDarkMode()" style="cursor:pointer; font-size:24px;">🌙</span>
+    </div>
+
+    <div id="home-view" class="view-section">
+        <div style="text-align: center; padding: 30px;"><input type="text" id="search" onkeyup="filter()" placeholder="بحث عن سورة..." style="width: 80%; padding: 15px; border-radius: 35px; border: 2px solid var(--gold); text-align: center;"></div>
+        <div id="grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 20px;"></div>
+    </div>
+
+    <div id="rosary-view" class="view-section" style="display:none; text-align:center; padding:20px;">
+        <div class="rosary-card">
+            <select id="dhikrSelector" onchange="document.getElementById('dhikrBox').innerText=this.value" style="width:100%; padding:10px; margin-bottom:20px;">
+                <option>سبحان الله</option><option>الحمد لله</option><option>الله أكبر</option><option>أستغفر الله</option>
+            </select>
+            <div id="dhikrBox" style="font-size: 2rem; font-weight: bold;">سبحان الله</div>
+            <div id="rosaryCounter" style="font-size: 80px; font-weight: bold; color: var(--gold); margin: 20px 0;">0</div>
+            <button onclick="countUp()" style="background: linear-gradient(45deg, #fdbb2d, #b21f1f); color: white; border: none; padding: 20px; width: 100%; font-size: 1.5rem; border-radius: 50px; cursor: pointer;">تسبيح</button>
+        </div>
+    </div>
+
+    <div id="reading-view" class="view-section" style="display:none;">
+        <div style="background: #111; color: white; padding: 40px; text-align: center; border-bottom: 4px solid var(--gold);">
+            <h1 id="surah-title-text" style="color: var(--gold); font-family: 'Amiri'; font-size: 3.5rem;"></h1>
+            <audio id="audio-player" controls style="width:100%; max-width:500px;"></audio>
+            <br>
+            <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; cursor:pointer;">العودة للفهرس</button>
+        </div>
+        <div class="reading-area" id="quran-text"></div>
+    </div>
+</div>
+
+<script>
+    let surahs = [];
+    let count = parseInt(localStorage.getItem('rosaryCount')) || 0;
+    document.getElementById("rosaryCounter").innerText = count;
+
+    // وظيفة تحديث الوقت والتاريخ الإلكتروني
+    function startClock() {
+        setInterval(() => {
+            const now = new Date();
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            
+            document.getElementById('clock').innerText = now.toLocaleTimeString('ar-EG', timeOptions);
+            document.getElementById('date').innerText = now.toLocaleDateString('ar-EG', dateOptions);
+        }, 1000);
+    }
+    startClock();
+
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        document.getElementById('modeBtn').innerText = isDark ? "☀️" : "🌙";
+    }
+
+    window.onscroll = function() {
+        const btn = document.getElementById("scrollToTop");
+        btn.style.display = (window.scrollY > 300) ? "flex" : "none";
+    };
+
+    function goToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function openNav() { document.getElementById("mySidenav").style.width = "300px"; }
+    function closeNav() { document.getElementById("mySidenav").style.width = "0"; }
+
+    function showView(id) {
+        document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        closeNav();
+    }
+
+    function enterApp() {
+        document.getElementById('welcome-screen').style.transform = 'translateY(-100%)';
+        setTimeout(() => {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        }, 800);
+        loadData();
+    }
+
+    async function loadData() {
+        const res = await fetch('https://api.alquran.cloud/v1/surah');
+        const data = await res.json();
+        surahs = data.data;
+        render(surahs);
+    }
+
+    function render(list) {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        list.forEach(s => {
+            const d = document.createElement('div');
+            d.className = 'surah-card';
+            d.innerHTML = `سورة <b>${s.name}</b>`;
+            d.onclick = () => openSurah(s);
+            grid.appendChild(d);
+        });
+    }
+
+    async function openSurah(s) {
+        showView('reading-view');
+        document.getElementById('surah-title-text').innerText = `سورة ${s.name}`;
+        document.getElementById('audio-player').src = `https://server8.mp3quran.net/afs/${s.number.toString().padStart(3, '0')}.mp3`;
+        const res = await fetch(`https://api.alquran.cloud/v1/surah/${s.number}`);
+        const data = await res.json();
+        let html = (s.number !== 1 && s.number !== 9) ? '<div style="font-size: 3rem; margin-bottom: 30px;">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>' : '';
+        data.data.ayahs.forEach((a) => {
+            html += `<span class="aya-text" onclick="getTafsir(${s.number}, ${a.numberInSurah})">${a.text} <b style="color:var(--gold)">(${a.numberInSurah})</b> </span>`;
+        });
+        document.getElementById('quran-text').innerHTML = html;
+    }
+
+    async function getTafsir(surahNum, ayaNum) {
+        const modal = document.getElementById('tafsir-modal');
+        const content = document.getElementById('tafsir-content');
+        content.innerText = "جاري تحميل التفسير...";
+        modal.style.display = "block";
+        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNum}:${ayaNum}/ar.jalalayn`);
+        const data = await res.json();
+        content.innerText = data.data.text;
+    }
+
+    function countUp() { count++; document.getElementById("rosaryCounter").innerText = count; localStorage.setItem('rosaryCount', count); }
+    function filter() { const v = document.getElementById('search').value; render(surahs.filter(s => s.name.includes(v))); }
+
+    const colors = ['#1e3d1a', '#0d1a0b', '#1a2e3d', '#3d2b1a'];
+    let cIdx = 0;
+    setInterval(() => {
+        const scr = document.getElementById('welcome-screen');
+        if(scr) { scr.style.backgroundColor = colors[cIdx]; cIdx = (cIdx + 1) % colors.length; }
+    }, 5000);
+</script>
+</body>
+</html>
+<script type="text/javascript">
+(function() {
+
+})();
+</script>
+</body>
+</html>
